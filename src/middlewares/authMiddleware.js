@@ -13,31 +13,14 @@ authMiddleware = (req, res, next) => {
   });
 };
 
-const getRole =  async (userId) => {
-  try {
-    const [rows] = await db.execute(
-      'SELECT role FROM users WHERE id = ?',
-      [userId]
-    );
-
-    if (rows.length > 0) {
-      return rows[0].role; 
-    }
-    return null;
-  } catch (error) {
-    console.error(error)
-    throw error;
-  }
-};
 
 const authorizeRole = (requiredRoles) => {
   return async (req, res, next) => {
-    const userId = req.user.id; 
+    const role = req.user.role;
 
     try {
-      const role = await getRole(userId);
       if (!role || !requiredRoles.includes(role)) {
-        return res.status(403).json({ message: 'No tienes permiso para realizar esta acción', requiredRoles, "Su rol es: ": role });
+        return res.status(401).json({ message: 'No tienes permiso para realizar esta acción', requiredRoles, "Su rol es: ": role });
       }
       next();
     } catch (error) {
@@ -46,4 +29,4 @@ const authorizeRole = (requiredRoles) => {
   };
 };
 
-module.exports = { authMiddleware, authorizeRole, getRole };
+module.exports = { authMiddleware, authorizeRole };

@@ -9,7 +9,5 @@ router.post('/', authMiddleware, authorizeRole(['ADMIN']), createLaptop);
 router.put('/:laptopId', authMiddleware, authorizeRole(['ADMIN']), updateLaptop);
 router.delete('/:laptopId', authMiddleware, authorizeRole(['ADMIN']), deleteLaptop);
 
-//router.get('/admin/:id', getById);
-
 
 module.exports = router;

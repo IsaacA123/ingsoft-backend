@@ -1,12 +1,12 @@
 const nodemailer = require('nodemailer');
-const db = require('../config/db'); 
+const db = require('./db'); 
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
     service: 'gmail', 
     auth: {
-        user: 'isaccamadorla2@gmail.com', 
-        pass: process.env.EMAIL_PASS 
+        user: process.env.CODES_EMAIL,
+        pass: process.env.CODES_PASS 
     }
 });
 
@@ -49,7 +49,7 @@ async function verifyCode(email, code) {
         const { verification_code, expiration } = row;
 
         if (code === verification_code && new Date() <= new Date(expiration)) {
-            await db.execute('DELETE FROM verification_codes WHERE email = ? AND verification_code = ?', [email, verification_code]);
+            await db.execute('DELETE FROM verification_codes WHERE email = ?', [email]);
             return true;
         }
     }

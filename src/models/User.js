@@ -57,16 +57,6 @@ class User {
     }
   }
 
-  static async findAll() {
-    try {
-      const [rows] = await db.execute('SELECT * FROM users'); 
-      return rows.length > 0 ? rows[0] : null;
-    } catch (error) {
-      console.error('Error al buscar los usuarios:', error);
-      throw error; 
-    }
-  }
-
   static async findById(id) {
     try {
       const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [id]); 
@@ -79,7 +69,7 @@ class User {
 
   static async findByRole(role) {
     try {
-      const [rows] = await db.execute('SELECT * FROM users WHERE role = ?', [role]); 
+      const [rows] = await db.execute('SELECT id, email, role FROM users WHERE role = ?', [role]); 
       return rows; 
     } catch (error) {
       console.error('Error al buscar usuarios por rol:', error);

@@ -1,0 +1,452 @@
+openapi: 3.0.0
+tags:
+  - name: auth
+    description: Logearse, o recibir un codigo para registrarse.
+  - name: profile
+    description: Cambiar correo, contraseña o ver datos del usuario.
+  - name: superadmin
+    description: Gestionar los usuarios administradores.
+  - name: admin
+    description: Gestionar los portatiles, reservas, y visualizar todos los estudiantes.
+  - name: student
+    description: Hacer reservas de portatiles, consultar informacion de sus reservas, etc.
+    
+## authRoutes.js
+paths:
+  /auth/send-code:
+    post:
+      tags:
+        - auth
+      summary: Enviar código al correo para registrarse como estudiante
+      requestBody:
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    example: "correo@gmail.com"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      
+  /auth/register-student:
+    post:
+      tags:
+        - auth
+      summary: Registro de un estudiante
+      requestBody:
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    example: "correo@gmail.com"
+                  password:
+                    type: string
+                    example: "123456"
+                  code:
+                    example: "6123"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Inicio de sesión
+      requestBody:
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    example: "correo@gmail.com"
+                  password:
+                    type: string
+                    example: "123456"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+          
+## adminRoutes.js
+  /admins:
+    get:
+      tags:
+        - superadmin
+      summary: Obtener lista de administradores
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+    post:
+      tags:
+        - superadmin
+      summary: Crear un nuevo administrador
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  example: "correo@gmail.com"
+                password:
+                  type: string
+                  example: "123456"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+  /admins/{id}:
+    delete:
+      tags:
+        - superadmin
+      summary: Eliminar un administrador por ID
+      parameters:
+        - name: id
+          in: path
+          description: 'Identificador del administrador'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+        
+## selfRoutes.js
+  /self:
+    get:
+      tags:
+        - profile
+      summary: Obtener información del usuario actual
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+  /self/change_pass:
+    put:
+      tags:
+        - profile
+      summary: Cambiar la contraseña del usuario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "123456"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+  /self/change_email:
+    put:
+      tags:
+        - profile
+      summary: Cambiar el correo electrónico del usuario
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  example: "correo@gmail.com"
+                code:
+                  example: "5413"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+      - BearerAuth: []
+      
+## laptopRoutes.js
+  /laptops:
+    get:
+      tags:
+        - admin
+        - student
+      summary: Listar todos los portatiles registrados
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+    post:
+      tags:
+        - admin
+      summary: Crear un nuevo portatil
+      description: 'Estados posibles: "ESTADO 1", "ESTADO 2", "ESTADO 3"'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  example: "Lorem ipsum"
+                state:
+                   enum:
+                    - "ESTADO 1"
+                    - "ESTADO 2"
+                    - "ESTADO 3"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+  /laptops/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: 'Identificador del portatil'
+        required: true
+        schema:
+          type: integer
+    put:
+      tags:
+        - admin
+      summary: Actualizar un portatil por el ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  example: "Lorem ipsum"
+                state:
+                   enum:
+                    - "ESTADO 1"
+                    - "ESTADO 2"
+                    - "ESTADO 3"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+    delete:
+      tags:
+        - admin
+      summary: Eliminar un portatil por el ID
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+        
+## reservationRoutes.js
+  /reservations:
+    get:
+      tags:
+        - admin
+        - student
+      summary: Listar todas las reservas de portatiles hechas
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+    post:
+      tags:
+        - student
+      summary: Hacer una reserva de un portatil
+      description: 'Estados posibles: "ESTADO R1", "ESTADO R2", "ESTADO R3"'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state:
+                  enum:
+                    - "ESTADO R1"
+                    - "ESTADO R2"
+                    - "ESTADO R3"
+                reservation_date:
+                  example: "2024-10-25"
+                start_time:
+                  example: "14:30"
+                end_time:
+                  example: "16:30"
+                laptop_id:
+                  example: "2"
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+  /reservations/state/{id}:
+    parameters:
+        - name: id
+          in: path
+          description: 'Identificador del estado de la reserva'
+          required: true
+          schema:
+            type: integer
+    put:
+      tags:
+        - admin
+      summary: Actualizar el estado de una reserva por el ID
+      description: 'Estados posibles: "ESTADO R1", "ESTADO R2", "ESTADO R3"'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state:
+                   enum:
+                    - "ESTADO R1"
+                    - "ESTADO R2"
+                    - "ESTADO R3"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+  /reservations/{id}:
+    parameters:
+        - name: id
+          in: path
+          description: 'Identificador de la reserva'
+          required: true
+          schema:
+            type: integer
+    get:
+      tags:
+        - admin
+        - student
+      summary: Ver la información de una reserva
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+    delete:
+      tags:
+        - admin
+        - student
+      summary: Eliminar la reserva de un portatil por el ID
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+
+## studentRoutes.js
+  /students:
+    get:
+      tags:
+        - admin
+      summary: Listar todos los estudiantes registrados
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - BearerAuth: []
+## Componentes
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

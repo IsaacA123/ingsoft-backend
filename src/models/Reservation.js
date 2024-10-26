@@ -1,30 +1,30 @@
 const db = require('../config/db'); 
 const Joi = require('joi');
 
-class Reservation {
-  static async create({ state, reservation_date, start_time, end_time, user_id, reserved_by_user_id, laptop_id }) {
-    const reservationSchema = Joi.object({
-        state: Joi.string().valid('ESTADO R1', 'ESTADO R2', 'ESTADO R3').required(),
-        reservation_date: Joi.date().required(),
-        start_time: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/).required(),
-        end_time: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/).required(),
-        user_id: Joi.number().integer().required(),
-        reserved_by_user_id: Joi.number().integer().optional(),
-        laptop_id: Joi.number().integer().required(),
-    });
-  const reservationStatusSchema = Joi.object({
-      state: Joi.string().valid('ESTADO R1', 'ESTADO R2', 'ESTADO R3').required()
-  });
+const reservationSchema = Joi.object({
+    state: Joi.string().valid('ESTADO R1', 'ESTADO R2', 'ESTADO R3').required(),
+    reservation_date: Joi.date().required(),
+    start_time: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/).required(),
+    end_time: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/).required(),
+    reserved_by_user_id: Joi.number().integer().optional(),
+    laptop_id: Joi.number().integer().required(),
+});
+const reservationStatusSchema = Joi.object({
+  state: Joi.string().valid('ESTADO R1', 'ESTADO R2', 'ESTADO R3').required()
+});
 
-    const { erroror } = reservationSchema.validate({ state, reservation_date, start_time, end_time, user_id, reserved_by_user_id, laptop_id });
-    if (erroror) {
-        throw new erroror(`Validation error: ${erroror.details[0].message}`);
+class Reservation {
+
+  static async create({ state, reservation_date, start_time, end_time, reserved_by_user_id, laptop_id }) {
+    const { error } = reservationSchema.validate({ state, reservation_date, start_time, end_time, reserved_by_user_id, laptop_id });
+    if (error) { 
+        throw new Error(`Validation error: ${error.details[0].message}`);
     }
 
     try {
         const [result] = await db.execute(
-            'INSERT INTO reservations (state, reservation_date, start_time, end_time, user_id, reserved_by_user_id, laptop_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [state, reservation_date, start_time, end_time, user_id, reserved_by_user_id, laptop_id]
+            'INSERT INTO reservations (state, reservation_date, start_time, end_time, reserved_by_user_id, laptop_id) VALUES (?, ?, ?, ?, ?, ?)',
+            [state, reservation_date, start_time, end_time, reserved_by_user_id, laptop_id]
         );
         return result;
     } catch (error) {
@@ -33,14 +33,14 @@ class Reservation {
     }
   }
 
-    static async findById(reservationId, userId, userRole) {
+    static async findById(reservationId) {
       try {
         const [result] = await db.execute('SELECT * FROM reservations WHERE id = ?', [reservationId]);
         
         if (result.length === 0) {
-            throw new erroror('Reserva no encontrada');
+            throw new Error('Reserva no encontrada');
         }
-        return result;
+        return result[0];
       } catch (error) {
           console.error('error al buscar la reserva:', error);
           throw error;
@@ -62,9 +62,9 @@ class Reservation {
         }
     }
 
-    static async delete(reservationId, { state }) {
+    static async delete(reservationId) {
         try {
-            const [result] = await db.execute('DELETE FROM reservations WHERE id = ?', [id]);
+            const [result] = await db.execute('DELETE FROM reservations WHERE id = ?', [reservationId]);
             return result;
         } catch (error) {
             console.error('error al eliminar la reserva:', error);

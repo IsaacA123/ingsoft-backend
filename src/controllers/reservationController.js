@@ -1,9 +1,13 @@
 const Reservation = require('../models/Reservation');
+const { authorizeRole } = require('../middlewares/authMiddleware');
+
 
 exports.create = async (req, res) => {
-    const { state, reservation_date, start_time, end_time, user_id, reserved_by_user_id, laptop_id } = req.body;
+    const { state, reservation_date, start_time, end_time, laptop_id } = req.body;
+    const reserved_by_user_id = req.user.id;
+
     try {
-        const result = await Reservation.create({ state, reservation_date, start_time, end_time, user_id, reserved_by_user_id, laptop_id });
+        const result = await Reservation.create({ state, reservation_date, start_time, end_time, reserved_by_user_id, laptop_id });
         res.status(201).json({ message: "Reserva creada correctamente", reservationId: result.insertId });
     } catch (error) {
         console.error(error);
@@ -12,8 +16,12 @@ exports.create = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
+    const role = req.user.role;
+    const userId = req.user.id;
     try {
-        const result = await Reservation.findAll();
+        const result = (role === 'STUDENT') 
+            ? await Reservation.findByUser(userId) 
+            : await Reservation.findAll();
         res.status(200).json(result);
     } catch (error) {
         console.error(error);
@@ -23,25 +31,23 @@ exports.getAll = async (req, res) => {
 
 exports.getById = async (req, res) => {
     const {reservationId} = req.params;
+    const userId = req.user.id;
+    
     try {
         const result = await Reservation.findById(reservationId);
-        res.status(200).json(result);
+        if(result.reserved_by_user_id != userId){
+            authorizeRole(['ADMIN'])(req, res, () => {
+                res.status(200).json(result);
+            });
+        } else {
+            res.status(200).json(result);
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error obteniendo las reservas', error: error.message });
     }
 };
 
-exports.getSelfAll = async (req, res) => {
-    const userId = req.user.id;
-    try {
-        const result = await Reservation.findByUser(userId);
-        res.status(200).json(result);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error obteniendo las reservas', error: error.message });
-    }
-};
 
 exports.updateReservationState = async (req, res) => {
     const { reservationId } = req.params;
@@ -58,10 +64,20 @@ exports.updateReservationState = async (req, res) => {
 
 exports.deleteReservation = async (req, res) => {
     const { reservationId } = req.params;
+    const userId = req.user.id;
 
     try {
-        await Reservation.delete(reservationId);
-        res.status(200).json({ message: 'Reserva eliminada correctamente' });
+        const result = await Reservation.findById(reservationId);
+        if(result.reserved_by_user_id != userId){
+            await authorizeRole(['ADMIN'])(req, res, async () => {
+                await Reservation.delete(reservationId);
+                res.status(200).json({ message: 'Reserva eliminada correctamente usando privilegios de administrador' });
+            });
+        } else {
+            await Reservation.delete(reservationId);
+            res.status(200).json({ message: 'Reserva eliminada correctamente' });
+        }
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error eliminando la reserva', error: error.message });
