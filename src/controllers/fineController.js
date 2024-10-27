@@ -47,7 +47,6 @@ exports.getById = async (req, res) => {
     }
 };
 
-
 exports.deleteFine = async (req, res) => {
     const { fineId } = req.params;
 
