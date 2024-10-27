@@ -52,6 +52,7 @@ paths:
                     type: string
                     example: "123456"
                   code:
+                    type: string
                     example: "6123"
         required: true
       responses:
@@ -209,6 +210,7 @@ paths:
                 email:
                   example: "correo@gmail.com"
                 code:
+                  type: string
                   example: "5413"
         required: true
       responses:
