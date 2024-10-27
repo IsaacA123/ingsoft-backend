@@ -7,9 +7,9 @@ tags:
   - name: superadmin
     description: Gestionar los usuarios administradores.
   - name: admin
-    description: Gestionar los portatiles, reservas, y visualizar todos los estudiantes.
+    description: Gestionar los portatiles, reservas, multas y visualizar todos los estudiantes.
   - name: student
-    description: Hacer reservas de portatiles, consultar informacion de sus reservas, etc.
+    description: Hacer reservas de portatiles, consultar informacion de sus reservas, multas, etc.
     
 ## authRoutes.js
 paths:
@@ -85,6 +85,14 @@ paths:
           description: Error de credenciales
         '500':
           description: Error del servidor
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: Cerrar la sesión
+      responses:
+        '200':
+          description: Operación exitosa
           
 ## adminRoutes.js
   /admins:
@@ -100,7 +108,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
     post:
       tags:
         - superadmin
@@ -125,7 +133,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
   /admins/{id}:
     delete:
       tags:
@@ -146,7 +154,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
         
 ## selfRoutes.js
   /self:
@@ -162,7 +170,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
   /self/change_pass:
     put:
       tags:
@@ -186,7 +194,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
   /self/change_email:
     put:
       tags:
@@ -211,7 +219,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-      - BearerAuth: []
+      - cookieAuth: []
       
 ## laptopRoutes.js
   /laptops:
@@ -228,7 +236,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
     post:
       tags:
         - admin
@@ -256,7 +264,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
   /laptops/{id}:
     parameters:
       - name: id
@@ -291,7 +299,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
     delete:
       tags:
         - admin
@@ -304,7 +312,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
         
 ## reservationRoutes.js
   /reservations:
@@ -321,7 +329,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
     post:
       tags:
         - student
@@ -356,7 +364,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
   /reservations/state/{id}:
     parameters:
         - name: id
@@ -390,7 +398,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
   /reservations/{id}:
     parameters:
         - name: id
@@ -412,7 +420,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
     delete:
       tags:
         - admin
@@ -426,7 +434,7 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
 
 ## studentRoutes.js
   /students:
@@ -442,11 +450,93 @@ paths:
         '500':
           description: Error del servidor
       security:
-        - BearerAuth: []
+        - cookieAuth: []
+
+## fineRoutes.js
+  /fines:
+    get:
+      tags:
+        - admin
+        - student
+      summary: Listar todos las multas registradas
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    post:
+      tags:
+        - admin
+      summary: Crear una multa para un estudiante
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  example: "Multa por retraso en la entrega"
+                description:
+                  example: "Esta multa se aplica por no devolver el portátil a tiempo."
+                end_date:
+                  example: "2024-10-26"
+                user_id:
+                  example: "2"
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+  /fines/{id}:
+    parameters:
+        - name: id
+          in: path
+          description: 'Identificador de la multa'
+          required: true
+          schema:
+            type: integer  
+    get:
+      tags:
+        - admin
+        - student
+      summary: Obetener los datos de una multa por su ID
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    delete:
+      tags:
+        - admin
+      summary: Eliminar una multa hecha a un estudiante
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
 ## Componentes
-components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+components: 
+  securitySchemes: 
+    cookieAuth: 
+        type: "apiKey"
+        in: "cookies"
+        name: "token"
+

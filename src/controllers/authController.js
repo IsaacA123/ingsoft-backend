@@ -42,7 +42,11 @@ exports.registerStudent = async (req, res) => {
     const user = await User.findByEmail(email);
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    res.cookie('token', token, {
+      httpOnly: true, 
+      maxAge: 360000 // 1 hora
+    });
+    res.status(201).json({ message: 'Usuarios registrado con exito!' });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Error registrando el usuario', error: error.message});
@@ -61,9 +65,20 @@ exports.login = async (req, res) => {
     }
     
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    res.cookie('token', token, {
+      httpOnly: true, 
+      maxAge: 360000 // 1 hora
+    });
+
+    res.status(200).json({ message: 'Sesión iniciada con exito. ¡Bienvenido!' });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Error del servidor:',  error: error.message });
   }
 };
+
+exports.logout = (req, res) => {
+  res.clearCookie('token'); 
+  res.status(200).json({ message: 'Sesión cerrada con éxito.' });
+};
+

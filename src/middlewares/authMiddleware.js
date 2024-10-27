@@ -1,9 +1,8 @@
 const jwt = require('jsonwebtoken');
-const db = require('../config/db');
 require('dotenv').config();
 
 authMiddleware = (req, res, next) => {
-  const token = req.headers['authorization'];
+  const token = req.cookies.token; 
   if (!token) return res.status(401).json({ message: 'No se proporcionó un token' });
   
   jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET, (err, decoded) => {
@@ -20,7 +19,7 @@ const authorizeRole = (requiredRoles) => {
 
     try {
       if (!role || !requiredRoles.includes(role)) {
-        return res.status(401).json({ message: 'No tienes permiso para realizar esta acción', requiredRoles, "Su rol es: ": role });
+        return res.status(403).json({ message: 'No tienes permiso para realizar esta acción', requiredRoles, "Su rol es: ": role });
       }
       next();
     } catch (error) {
