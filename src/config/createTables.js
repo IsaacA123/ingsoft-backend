@@ -18,10 +18,9 @@ const createTables = async () => {
     await db.execute(`
       CREATE TABLE IF NOT EXISTS verification_codes (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        email VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
         verification_code VARCHAR(64) NOT NULL,
-        expiration DATETIME NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        expiration DATETIME NOT NULL
       );
     `);
 

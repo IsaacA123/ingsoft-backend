@@ -16,19 +16,21 @@ async function sendVerificationEmail(email) {
     console.log("CODIGO: ", verificationCode);
 
     const mailOptions = {
-        from: 'tu_correo@gmail.com',
+        from:  process.env.CODES_EMAIL,
         to: email,
         subject: 'Codigo de verificación.',
-        text: `Tu código de verificación es: ${verificationCode}. Este código expira en 1 hora.`,
+        html: `
+            <h2>¡Bienvenido! Al sistema de prestamos de portatiles 💻</h2>
+            <p>Tu código de verificación es: <strong style="color: blue;">${verificationCode}</strong>.</p>
+            <p>Este código expira en 1 hora.</p>
+        `
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log('Correo de verificación enviado.');
-
         await db.execute(
-            'INSERT INTO verification_codes (email, verification_code, expiration) VALUES (?, ?, ?)',
-            [email, verificationCode, expirationDate]
+            'INSERT INTO verification_codes (email, verification_code, expiration) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE verification_code = ?, expiration = ?',
+            [email, verificationCode, expirationDate, verificationCode, expirationDate]
         );
 
         return { verificationCode, expirationDate };
