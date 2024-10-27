@@ -44,7 +44,7 @@ exports.registerStudent = async (req, res) => {
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('token', token, {
       httpOnly: true, 
-      maxAge: 360000 // 1 hora
+      maxAge: 3600000 // 1 hora
     });
     res.status(201).json({ message: 'Usuarios registrado con exito!' });
   } catch (error) {
@@ -67,7 +67,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('token', token, {
       httpOnly: true, 
-      maxAge: 360000 // 1 hora
+      maxAge: 3600000 // 1 hora
     });
 
     res.status(200).json({ message: 'Sesión iniciada con exito. ¡Bienvenido!' });
