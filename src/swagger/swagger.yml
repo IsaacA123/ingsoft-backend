@@ -13,7 +13,7 @@ tags:
     
 ## authRoutes.js
 paths:
-  /auth/send-code:
+  /auth/register/send-code:
     post:
       tags:
         - auth
@@ -35,7 +35,7 @@ paths:
         '500':
           description: Error del servidor
       
-  /auth/register-student:
+  /auth/register:
     post:
       tags:
         - auth
@@ -94,7 +94,78 @@ paths:
       responses:
         '200':
           description: Operación exitosa
-          
+  /auth/recovery/send-code:
+    post:
+      tags:
+        - auth
+      summary: Enviar código al correo para recuperar la contraseña
+      requestBody:
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    example: "correo@gmail.com"
+        required: true  
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor 
+  /auth/recovery/reset-password:
+    post:
+      tags:
+        - auth
+      summary: Actualizar la contraseña
+      requestBody:
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    example: "correo@gmail.com"
+                  password:
+                    type: string
+                    example: "123456"
+                  code:
+                    type: string
+                    example: "6123"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor 
+  /auth/verify-code:
+    post:
+      tags:
+        - auth
+      summary: Verifica si un codigo de seguridad existe para ese correo y no ha expirado
+      requestBody:
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    example: "correo@gmail.com"
+                  code:
+                    type: string
+                    example: "6123"
+        required: true    
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor    
 ## adminRoutes.js
   /admins:
     get:

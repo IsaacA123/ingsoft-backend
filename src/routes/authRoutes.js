@@ -1,15 +1,23 @@
 const express = require('express');
-const router = express.Router();
-const { sendCode, registerStudent, login, logout } = require('../controllers/authController');
+const authRoutes = express.Router();
+const { sendCodeRegister, verifyCode, registerStudent, login, logout, sendCodeRecovery, resetPassword} = require('../controllers/authController');
 
 
-//registro (solo para registrar estudiantes)
-router.post('/send-code', sendCode);
-router.post('/register-student', registerStudent);
-//inicio sesión
-router.post('/login', login);
+// registro (solo para registrar estudiantes)
+authRoutes.post('/register/send-code', sendCodeRegister);
+authRoutes.post('/register/', registerStudent);
 
-router.post('/logout', logout);
+// inicio de sesión
+authRoutes.post('/login', login);
 
+// cierre de sesión
+authRoutes.post('/logout', logout);
 
-module.exports = router;
+// recuperar contraseña
+authRoutes.post('/recovery/send-code', sendCodeRecovery);
+authRoutes.post('/recovery/reset-password', resetPassword);
+
+authRoutes.post('/verify-code', verifyCode);
+
+ 
+module.exports = authRoutes;

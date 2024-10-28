@@ -1,12 +1,12 @@
 const express = require('express');
-const router = express.Router();
 const { getAll, createAdmin, deleteAdmin } = require('../controllers/adminController');
 const { authMiddleware, authorizeRole } = require('../middlewares/authMiddleware');
+const adminRoutes = express.Router();
 
 
-router.get('/', authMiddleware, authorizeRole(['SUPERADMIN']), getAll);
-router.post('/', authMiddleware, authorizeRole(['SUPERADMIN']), createAdmin);
-router.delete('/:userId', authMiddleware, authorizeRole(['SUPERADMIN']), deleteAdmin);
+adminRoutes.get('/', authMiddleware, authorizeRole(['SUPERADMIN']), getAll);
+adminRoutes.post('/', authMiddleware, authorizeRole(['SUPERADMIN']), createAdmin);
+adminRoutes.delete('/:userId', authMiddleware, authorizeRole(['SUPERADMIN']), deleteAdmin);
 
 
-module.exports = router;
+module.exports = adminRoutes;

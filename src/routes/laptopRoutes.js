@@ -1,13 +1,13 @@
 const express = require('express');
-const router = express.Router();
+const laptopRoutes = express.Router();
 const { getAll, createLaptop, updateLaptop, deleteLaptop } = require('../controllers/laptopController');
 const { authMiddleware, authorizeRole } = require('../middlewares/authMiddleware');
 
 
-router.get('/', authMiddleware, authorizeRole(['ADMIN', "STUDENT"]), getAll);
-router.post('/', authMiddleware, authorizeRole(['ADMIN']), createLaptop);
-router.put('/:laptopId', authMiddleware, authorizeRole(['ADMIN']), updateLaptop);
-router.delete('/:laptopId', authMiddleware, authorizeRole(['ADMIN']), deleteLaptop);
+laptopRoutes.get('/', authMiddleware, authorizeRole(['ADMIN', "STUDENT"]), getAll);
+laptopRoutes.post('/', authMiddleware, authorizeRole(['ADMIN']), createLaptop);
+laptopRoutes.put('/:laptopId', authMiddleware, authorizeRole(['ADMIN']), updateLaptop);
+laptopRoutes.delete('/:laptopId', authMiddleware, authorizeRole(['ADMIN']), deleteLaptop);
 
 
-module.exports = router;
+module.exports = laptopRoutes;

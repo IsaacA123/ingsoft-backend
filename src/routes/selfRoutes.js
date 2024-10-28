@@ -1,12 +1,12 @@
 const express = require('express');
-const router = express.Router();
+const selfRoutes = express.Router();
 const { getSelf, changeEmail, changePass } = require('../controllers/selfController');
-const { authMiddleware, authorizeRole } = require('../middlewares/authMiddleware');
+const { authMiddleware } = require('../middlewares/authMiddleware');
 
 
-router.get('/', authMiddleware, getSelf);
-router.put('/change_pass', authMiddleware, changePass);
-router.put('/change_email', authMiddleware, changeEmail);
+selfRoutes.get('/', authMiddleware, getSelf);
+selfRoutes.put('/change_pass', authMiddleware, changePass);
+selfRoutes.put('/change_email', authMiddleware, changeEmail);
 
 
-module.exports = router;
+module.exports = selfRoutes;

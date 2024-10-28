@@ -2,17 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const createTables = require('./config/createTables');
+const router = require('./routes/index');
 const { swaggerUi, specs  } = require('./swagger/swagger'); 
 require('dotenv').config();
-
-// Importando las rutas
-const authRoutes = require('./routes/authRoutes');
-const adminRoutes = require('./routes/adminRoutes');
-const studentRoutes = require('./routes/studentRoutes');
-const selfRoutes = require('./routes/selfRoutes');
-const laptopsRoutes = require('./routes/laptopRoutes');
-const reservationsRoutes = require('./routes/reservationRoutes');
-const finesRoutes = require('./routes/fineRoutes');
 
 const app = express();
 
@@ -22,15 +14,9 @@ app.use(cookieParser());
 app.use(express.json());
 
 // Rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/admins', adminRoutes);
-app.use('/api/students', studentRoutes);
-app.use('/api/self', selfRoutes);
-app.use('/api/laptops', laptopsRoutes);
-app.use('/api/reservations', reservationsRoutes);
-app.use('/api/fines', finesRoutes);
+app.use('/api', router)
 
-//Swagger documentación
+// Swagger documentación
 app.use('/', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Crear las tablas si no existen
