@@ -7,7 +7,7 @@ exports.getSelf = async (req, res) => {
   try {
     res.status(200).json({id, email, role});
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Error obteniendo los datos del usuario', error: error.message });
   }
 };
@@ -20,7 +20,7 @@ exports.changePass = async (req, res) => {
       await User.updateUser(userId, { password: passwordHash });
       res.status(200).json("Contraseña actualizada correctamente");
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(500).json({ message: 'Error obteniendo los datos del usuario', error: error.message });
     }
 };
@@ -38,7 +38,7 @@ exports.changeEmail = async (req, res) => {
     await User.updateUser(userId, { email }, code);
     res.status(200).json("Correo actualizado correctamente");
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Error obteniendo los datos del usuario', error: error.message });
   }
 };

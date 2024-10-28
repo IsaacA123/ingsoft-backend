@@ -6,7 +6,7 @@ exports.getAll = async (req, res) => {
       const result = await User.findByRole("ADMIN");
       res.status(200).json(result);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(500).json({ message: 'Error obteniendo los usuarios' , error: error.message });
     }
 };
@@ -24,7 +24,7 @@ exports.createAdmin = async(req, res) => {
     const result = await User.createAdmin({email, password: passwordHash});
     res.status(200).json({message: "Usuario creado correctamente", userId: result.insertId});
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Error Creando el usuario' , error: error.message });
   }
 }
