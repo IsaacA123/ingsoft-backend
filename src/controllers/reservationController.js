@@ -4,7 +4,7 @@ const { validateReservation } = require("../utils/validator");
 
 const { authorizeRole } = require('../middlewares/authMiddleware');
 const responseHandler = require('../utils/responseHandler');
-const ReservationDTO = require('../dtos/ReservationDTO');
+const ReservationDTO = require('../dtos/ReservationDto');
 
 exports.createReservation = async (req, res) => {
     const { reservation_date, start_time, end_time, laptop_id } = req.body;

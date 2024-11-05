@@ -7,5 +7,5 @@ class FineDTO {
     }
   }
   
-export default FineDTO;
+module.exports = FineDTO;
   

@@ -6,5 +6,5 @@ class LaptopDTO {
     }
   }
   
-  export default LaptopDTO;
+  module.exports = LaptopDTO;
   

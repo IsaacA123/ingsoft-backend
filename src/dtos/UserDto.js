@@ -18,5 +18,5 @@ class UserDTO {
     }
   }
   
-export default UserDTO;
+module.exports = UserDTO;
   

@@ -2,7 +2,7 @@ const Fine = require('../models/Fine');
 const { validateFine } = require("../utils/validator");
 const { authorizeRole } = require('../middlewares/authMiddleware');
 const responseHandler = require('../utils/responseHandler');
-const FineDTO = require('../dtos/FineDTO');
+const FineDTO = require('../dtos/FineDto');
 
 
 exports.createFine = async (req, res) => {
