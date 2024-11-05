@@ -1,21 +1,12 @@
 const db = require("../config/db");
-const Joi = require("joi");
-
-const laptopSchema = Joi.object({
-  description: Joi.string().allow('', null),
-  state: Joi.string().valid("ESTADO 1", "ESTADO 2", "ESTADO 3").required(),
-});
 
 class Laptop {
-  static async create({ description, state = "ESTADO 1" }) {
-    const { error } = laptopSchema.validate({ description, state });
-    if (error) {
-      throw new Error(`Error validando los datos: ${error.details[0].message}`);
-    }
+  static async create(laptopDTO) {
+    const { description, state_id, serial } = laptopDTO;
     try {
       const [result] = await db.execute(
-        "INSERT INTO laptops (description, state) VALUES (?, ?)",
-        [description, state]
+        "INSERT INTO laptops (description, state_id, serial) VALUES (?, ?, ?)",
+        [description, state_id, serial]
       );
       return result;
     } catch (error) {
@@ -24,15 +15,11 @@ class Laptop {
     }
   }
 
-  static async update(id, { description, state }) {
-    const { error } = laptopSchema.validate({ description, state });
-    if (error) {
-      throw new Error(`Error validando los datos: ${error.details[0].message}`);
-    }
+  static async update(id, { description, state_id, serial }) {
     try {
       const [result] = await db.execute(
-        `UPDATE laptops SET description = ?, state = ? WHERE id = ?`,
-        [description, state, id]
+        `UPDATE laptops SET description = ?, state_id = ?, serial = ? WHERE id = ?`,
+        [description, state_id, serial, id]
       );
       return result;
     } catch (error) {

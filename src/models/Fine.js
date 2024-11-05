@@ -1,20 +1,9 @@
 const db = require("../config/db");
-const Joi = require("joi");
-
-const reservationSchema = Joi.object({
-	name: Joi.string().max(255).required(),
-    description: Joi.string().allow('', null),
-    end_date: Joi.date().required(),
-    user_id: Joi.number().integer().required(),
-});
+const { validateFine } = require("../utils/validator");
 
 class Fine {
-	static async create({ name, description, end_date, user_id }) {
-		const { error } = reservationSchema.validate({ name, description, end_date, user_id });
-		if (error) {
-			throw new Error(`Formato incorrecto: ${error.details[0].message}`);
-		}
-
+	static async create(fineDto) {
+		const { name, description, end_date, user_id } = fineDto;
 		try {
 			const [result] = await db.execute("INSERT INTO fines (name, description, end_date, user_id) VALUES (?, ?, ?, ?)", [ name, description, end_date, user_id ]);
 			return result;

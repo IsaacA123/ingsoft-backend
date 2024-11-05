@@ -17,6 +17,33 @@ const options = {
     - Este tipo de usuario solo puede ser creado por el superadmin.
   - **Student**: 
     - Cualquier persona que se registre a través de los enlaces de autenticación .
+  ### Respuestas de Error
+  Cuando ocurre un error en la API, se devuelve una respuesta en el siguiente formato:
+  \`\`\`json
+  {
+    "status": 400,
+    "code": "INVALID_INPUT",
+    "message": "Errores de validación.",
+    "details": [
+        "El campo 'email' no puede estar vacío.",
+        "La contraseña debe tener al menos 6 caracteres."
+    ]
+  }
+  \`\`\`
+  ### Respuestas exitosas
+  Cuando se obtiene una respuesta exitosa en la API, se devuelve una respuesta en el siguiente formato:
+  \`\`\`
+  {
+    "status": "success",
+    "code": "USER_CREATED",
+    "message": "Solicitud procesada exitosamente."
+    "data": {
+      "id": 1,
+      "name": "Juan Pérez",
+      "email": "juan@example.com"
+      },
+  }
+  \`\`\`
       `,
     },
     servers: [

@@ -229,7 +229,7 @@ paths:
         - cookieAuth: []
         
 ## selfRoutes.js
-  /self:
+  /profile:
     get:
       tags:
         - profile
@@ -243,7 +243,7 @@ paths:
           description: Error del servidor
       security:
         - cookieAuth: []
-  /self/change_pass:
+  /profile/change_pass:
     put:
       tags:
         - profile
@@ -267,7 +267,7 @@ paths:
           description: Error del servidor
       security:
         - cookieAuth: []
-  /self/change_email:
+  /profile/change_email:
     put:
       tags:
         - profile
@@ -314,7 +314,6 @@ paths:
       tags:
         - admin
       summary: Crear un nuevo portatil
-      description: 'Estados posibles: "ESTADO 1", "ESTADO 2", "ESTADO 3"'
       requestBody:
         content:
           application/json:
@@ -323,11 +322,6 @@ paths:
               properties:
                 description:
                   example: "Lorem ipsum"
-                state:
-                   enum:
-                    - "ESTADO 1"
-                    - "ESTADO 2"
-                    - "ESTADO 3"
         required: true
       responses:
         '200':
@@ -358,11 +352,9 @@ paths:
               properties:
                 description:
                   example: "Lorem ipsum"
-                state:
-                   enum:
-                    - "ESTADO 1"
-                    - "ESTADO 2"
-                    - "ESTADO 3"
+                state_id:
+                  example: "2"
+                  type: string
         required: true
       responses:
         '200':
@@ -407,18 +399,12 @@ paths:
       tags:
         - student
       summary: Hacer una reserva de un portatil
-      description: 'Estados posibles: "ESTADO R1", "ESTADO R2", "ESTADO R3"'
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                state:
-                  enum:
-                    - "ESTADO R1"
-                    - "ESTADO R2"
-                    - "ESTADO R3"
                 reservation_date:
                   example: "2024-10-25"
                 start_time:
@@ -428,40 +414,6 @@ paths:
                 laptop_id:
                   example: "2"
                   type: string
-        required: true
-      responses:
-        '200':
-          description: Operación exitosa
-        '400':
-          description: Error de credenciales
-        '500':
-          description: Error del servidor
-      security:
-        - cookieAuth: []
-  /reservations/state/{id}:
-    parameters:
-        - name: id
-          in: path
-          description: 'Identificador del estado de la reserva'
-          required: true
-          schema:
-            type: integer
-    put:
-      tags:
-        - admin
-      summary: Actualizar el estado de una reserva por el ID
-      description: 'Estados posibles: "ESTADO R1", "ESTADO R2", "ESTADO R3"'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                state:
-                   enum:
-                    - "ESTADO R1"
-                    - "ESTADO R2"
-                    - "ESTADO R3"
         required: true
       responses:
         '200':
@@ -485,6 +437,29 @@ paths:
         - admin
         - student
       summary: Ver la información de una reserva
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    patch:
+      tags:
+        - admin
+      summary: Actualizar el estado de una reserva por el ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state_id:
+                  example: "2"
+                  type: string
+        required: true
       responses:
         '200':
           description: Operación exitosa
@@ -596,6 +571,205 @@ paths:
       tags:
         - admin
       summary: Eliminar una multa hecha a un estudiante
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+
+## ReservationStatesRoures.js
+  /reservation-states:
+    get:
+      tags:
+        - superadmin
+        - admin
+      summary: Obetener todos los estados posibles para las reservas
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    post:
+      tags:
+        - superadmin
+      summary: Crear un nuevo tipo de estado para las reservas de portatiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  example: "Pendiente de aprobación"
+                description:
+                  example: "En la espera que algun administrador aprueba la reserva"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+  /reservation-states/{id}:
+    parameters:
+        - name: id
+          in: path
+          description: 'Identificador de un estado de la tabla de estados de reserva'
+          required: true
+          schema:
+            type: integer  
+    get:
+      tags:
+        - superadmin
+        - admin
+      summary: Obetener los datos de un estado  de la tabla de estados de reserva
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    put:
+      tags:
+        - superadmin
+      summary: Actualizar los datos de un  estado para las reservas de portatiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  example: "Pendiente de aprobación"
+                description:
+                  example: "En la espera que algun administrador aprueba la reserva"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    delete:
+      tags:
+        - superadmin
+      summary: Eliminar un estado de la tabla de estatos de reserva
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+## LaptopStatesRoures.js
+  /laptop-states:
+    get:
+      tags:
+        - superadmin
+        - admin
+      summary: Obetener todos los estados posibles para los portatiles
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    post:
+      tags:
+        - superadmin
+      summary: Crear un nuevo tipo de estado para los portatiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  example: "Medio decente"
+                description:
+                  example: "Todavia prende y abre el word"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+  /laptop-states/{id}:
+    parameters:
+        - name: id
+          in: path
+          description: 'Identificador de un estado de la tabla de estados posibles de los portatiles'
+          required: true
+          schema:
+            type: integer  
+    get:
+      tags:
+        - superadmin
+        - admin
+      summary: Obetener los datos de un estado de la tabla de estados posibles de los portatiles
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    put:
+      tags:
+        - superadmin
+      summary: Actualizar los datos de un estado de la tabla de estados posibles de los portatiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  example: "Sin fallos"
+                description:
+                  example: "El portatil se encuentra en perfecto estado"
+        required: true
+      responses:
+        '200':
+          description: Operación exitosa
+        '400':
+          description: Error de credenciales
+        '500':
+          description: Error del servidor
+      security:
+        - cookieAuth: []
+    delete:
+      tags:
+        - superadmin
+      summary: Eliminar un estado de la tabla de estados posibles de los portatiles
       responses:
         '200':
           description: Operación exitosa

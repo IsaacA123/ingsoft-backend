@@ -1,37 +1,52 @@
 const Laptop = require('../models/Laptop');
+const { validateLaptop } = require('../utils/validator');
+const responseHandler = require('../utils/responseHandler');
+const LaptopDTO = require('../dtos/LaptopDTO');
 
 
 exports.getAll = async (req, res) => {
     try {
-      const result = await Laptop.findAll();
-      res.status(200).json(result);
+        const result = await Laptop.findAll();
+        return responseHandler(res, 200, "LAPTOPS_FETCHED", "Portátiles obtenidos correctamente.", result);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error obteniendo los portatiles' , error: error.message });
+        console.error(error);
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error obteniendo los portátiles.");
     }
 };
 
-exports.createLaptop = async(req, res) => {
-    const { description, state } = req.body;
+exports.createLaptop = async (req, res) => {
+    const { description, state_id, serial } = req.body;
+
     try {
-      const result = await Laptop.create({ description, state });
-      res.status(200).json({message: "Laptop creada correctamente", laptopId: result.insertId});
+        const { error } = validateLaptop({ description, state_id, serial } );
+        if (error) {
+            const messages = error.details.map(detail => detail.message);
+            return responseHandler(res, 400, "INVALID_INPUT", "Error de validación.", messages);
+        }
+        const laptopDTO = new LaptopDTO({ description, state_id, serial });
+        const result = await Laptop.create(laptopDTO);
+        return responseHandler(res, 201, "LAPTOP_CREATED", "Laptop creada correctamente.", { laptopId: result.insertId });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error Creando la Laptop' , error: error.message });
+        console.error(error);
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error creando la Laptop.");
     }
-}
+};
 
 exports.updateLaptop = async (req, res) => {
     const { laptopId } = req.params; 
-    const { description, state } = req.body; 
+    const { description, state_id, serial } = req.body; 
 
     try {
-        const result = await Laptop.update(laptopId, { description, state });
-        res.status(200).json({ message: 'Laptop actualizada correctamente' });
+        const { error } = validateLaptop({ description, state_id, serial } );
+        if (error) {
+            const messages = error.details.map(detail => detail.message);
+            return responseHandler(res, 400, "INVALID_INPUT", "Error de validación.", messages);
+        }
+        await Laptop.update(laptopId, { description, state });
+        return responseHandler(res, 200, "LAPTOP_UPDATED", "Laptop actualizada correctamente.");
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error actualizando la Laptop', error: error.message });
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error actualizando la Laptop.");
     }
 };
 
@@ -39,10 +54,10 @@ exports.deleteLaptop = async (req, res) => {
     const { laptopId } = req.params; 
 
     try {
-        const result = await Laptop.delete(laptopId);
-        res.status(200).json({ message: 'Laptop eliminada correctamente' });
+        await Laptop.delete(laptopId);
+        return responseHandler(res, 200, "LAPTOP_DELETED", "Laptop eliminada correctamente.");
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error eliminando la Laptop', error: error.message });
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error eliminando la Laptop.");
     }
 };

@@ -1,12 +1,12 @@
 const User = require('../models/User');
+const responseHandler = require('../utils/responseHandler');
 
 exports.getAll = async (req, res) => {
     try {
-      const result = await User.findByRole('STUDENT');
-      
-      res.status(200).json(result);
+        const result = await User.findByRole('STUDENT');
+        return responseHandler(res, 200, "STUDENTS_FETCHED", "Usuarios obtenidos correctamente.", result);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error obteniendo los usuarios' , error: error.message });
+        console.error(error);
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error obteniendo los usuarios.");
     }
 };

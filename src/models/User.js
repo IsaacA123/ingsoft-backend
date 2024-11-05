@@ -1,35 +1,22 @@
 const db = require("../config/db");
-const Joi = require("joi");
 
-const userSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().required(),
-});
 
 class User {
-  static async createAdmin({ email, password }) {
-    const { error } = userSchema.validate({ email, password });
-    if (error) {
-      throw new Error(`Formato no valido: ${error.details[0].message}`);
-    }
+  static async createAdmin(userDTO) {
+    const {email, password} = userDTO;
     try {
       const [result] = await db.execute(
         "INSERT INTO users (email, password, role) VALUES (?, ?, ?)",
         [email, password, "ADMIN"]
       );
-
       return result;
     } catch (error) {
-      console.error("Error:", error);
       throw error;
     }
   }
 
-  static async createStudent({ email, password }) {
-    const { error } = userSchema.validate({ email, password });
-    if (error) {
-      throw new Error(`Formato no valido: ${error.details[0].message}`);
-    }
+  static async createStudent(userDTO) {
+    const {email, password} = userDTO;
     try {
       const [result] = await db.execute(
         "INSERT INTO users (email, password, role) VALUES (?, ?, ?)",
@@ -37,7 +24,6 @@ class User {
       );
       return result;
     } catch (error) {
-      console.error("Error:", error);
       throw error;
     }
   }
@@ -49,7 +35,6 @@ class User {
       ]);
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
-      console.error("Error al buscar el usuario:", error);
       throw error;
     }
   }
@@ -59,7 +44,6 @@ class User {
       const [rows] = await db.execute("SELECT * FROM users WHERE id = ?", [id]);
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
-      console.error("Error al buscar el usuario:", error);
       throw error;
     }
   }
@@ -72,7 +56,6 @@ class User {
       );
       return rows;
     } catch (error) {
-      console.error("Error al buscar usuarios por rol:", error);
       throw error;
     }
   }
@@ -80,14 +63,6 @@ class User {
   static async updateUser(id, { email, password }, code) {
     try {
       if (email) {
-        const { error } = userSchema
-          .fork(["password"], (schema) => schema.optional())
-          .validate({ email });
-        if (error) {
-          throw new Error(
-            `Error validando el correo: ${error.details[0].message}`
-          );
-        }
         return await db.execute(`UPDATE users SET email = ? WHERE id = ?`, [
           email,
           id,
@@ -95,23 +70,13 @@ class User {
       }
 
       if (password) {
-        const { error } = userSchema
-          .fork(["email"], (schema) => schema.optional())
-          .validate({ password });
-        if (error) {
-          throw new Error(
-            `Error validando la contraseña: ${error.details[0].message}`
-          );
-        }
         return await db.execute(`UPDATE users SET password = ? WHERE id = ?`, [
           password,
           id,
         ]);
       }
-
-      throw new Error("No hay datos que actualizar:");
+      throw new Error("No hay email o contraseña que actualizar.");
     } catch (error) {
-      console.error("Error al actualizar el usuario:", error);
       throw error;
     }
   }
@@ -136,7 +101,6 @@ class User {
       const [result] = await db.execute("DELETE FROM users WHERE id = ?", [id]);
       return result;
     } catch (error) {
-      console.error("Error al eliminar el usuario:", error);
       throw error;
     }
   }

@@ -1,64 +1,79 @@
 const Reservation = require('../models/Reservation');
+const ReservationState = require('../models/ReservationState');
+const { validateReservation } = require("../utils/validator");
+
 const { authorizeRole } = require('../middlewares/authMiddleware');
+const responseHandler = require('../utils/responseHandler');
+const ReservationDTO = require('../dtos/ReservationDTO');
 
-
-exports.create = async (req, res) => {
-    const { state, reservation_date, start_time, end_time, laptop_id } = req.body;
+exports.createReservation = async (req, res) => {
+    const { reservation_date, start_time, end_time, laptop_id } = req.body;
     const reserved_by_user_id = req.user.id;
 
     try {
-        const result = await Reservation.create({ state, reservation_date, start_time, end_time, reserved_by_user_id, laptop_id });
-        res.status(201).json({ message: "Reserva creada correctamente", reservationId: result.insertId });
+        const { error } = validateReservation({ reservation_date, start_time, end_time, laptop_id } );
+        if (error) {
+            const messages = error.details.map(detail => detail.message);
+            return responseHandler(res, 400, "INVALID_INPUT", "Error de validación.", messages);
+        }
+        const reservationDTO = new ReservationDTO(reservation_date, start_time, end_time, reserved_by_user_id, laptop_id);
+        const result = await Reservation.create(reservationDTO);
+        return responseHandler(res, 201, "RESERVATION_CREATED", "Reserva creada correctamente.", { reservationId: result.insertId });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error creando la reserva', error: error.message });
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error creando la reserva.");
     }
 };
 
-exports.getAll = async (req, res) => {
+exports.getAllReservations = async (req, res) => {
     const role = req.user.role;
     const userId = req.user.id;
+
     try {
         const result = (role === 'STUDENT') 
             ? await Reservation.findByUser(userId) 
             : await Reservation.findAll();
-        res.status(200).json(result);
+        return responseHandler(res, 200, "RESERVATIONS_FETCHED", "Reservas obtenidas correctamente.", result);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error obteniendo las reservas', error: error.message });
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error obteniendo las reservas.");
     }
 };
 
-exports.getById = async (req, res) => {
-    const {reservationId} = req.params;
+exports.getReservationById = async (req, res) => {
+    const { reservationId } = req.params;
     const userId = req.user.id;
-    
+
     try {
         const result = await Reservation.findById(reservationId);
-        if(result.reserved_by_user_id != userId){
+        if (result.reserved_by_user_id !== userId) {
             authorizeRole(['ADMIN'])(req, res, () => {
-                res.status(200).json(result);
+                return responseHandler(res, 200, "RESERVATION_FETCHED", "Reserva obtenida correctamente.", result);
             });
         } else {
-            res.status(200).json(result);
+            return responseHandler(res, 200, "RESERVATION_FETCHED", "Reserva obtenida correctamente.", result);
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error obteniendo las reservas', error: error.message });
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error obteniendo la reserva.");
     }
 };
 
-
-exports.updateReservationState = async (req, res) => {
+exports.updateStateReservation = async (req, res) => {
     const { reservationId } = req.params;
-    const { state } = req.body;
+    const { state_id } = req.body;
 
     try {
-        await Reservation.updateState(reservationId, { state });
-        res.status(200).json({ message: 'Estado de la reserva actualizada correctamente' });
+        const existingUser = await ReservationState.findById(state_id);
+        if (existingUser) {
+            return responseHandler(res, 409, "EMAIL_ALREADY_REGISTERED", "Error en el Registro.", "El correo electrónico ya está registrado.");
+        }
+
+        await Reservation.updateReservationState(reservationId, { state_id });
+        return responseHandler(res, 200, "RESERVATION_STATE_UPDATED", "Estado de la reserva actualizado correctamente.");
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error actualizando la reserva', error: error.message });
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error actualizando la reserva.");
     }
 };
 
@@ -68,18 +83,17 @@ exports.deleteReservation = async (req, res) => {
 
     try {
         const result = await Reservation.findById(reservationId);
-        if(result.reserved_by_user_id != userId){
+        if (result.reserved_by_user_id !== userId) {
             await authorizeRole(['ADMIN'])(req, res, async () => {
                 await Reservation.delete(reservationId);
-                res.status(200).json({ message: 'Reserva eliminada correctamente usando privilegios de administrador' });
+                return responseHandler(res, 200, "RESERVATION_DELETED", "Reserva eliminada correctamente usando privilegios de administrador.");
             });
         } else {
             await Reservation.delete(reservationId);
-            res.status(200).json({ message: 'Reserva eliminada correctamente' });
+            return responseHandler(res, 200, "RESERVATION_DELETED", "Reserva eliminada correctamente.");
         }
-
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error eliminando la reserva', error: error.message });
+        return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error eliminando la reserva.");
     }
 };
