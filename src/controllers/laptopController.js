@@ -1,7 +1,7 @@
 const Laptop = require('../models/Laptop');
 const { validateLaptop } = require('../utils/validator');
 const responseHandler = require('../utils/responseHandler');
-const LaptopDTO = require('../dtos/LaptopDTO');
+const LaptopDTO = require('../dtos/LaptopDTO').default;
 
 
 exports.getAll = async (req, res) => {

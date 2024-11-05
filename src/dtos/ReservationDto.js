@@ -7,5 +7,5 @@ class ReservationDTO {
     }
   }
   
-  module.exports = ReservationDTO;
+  export default ReservationDTO;
   
