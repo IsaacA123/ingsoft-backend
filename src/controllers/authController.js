@@ -132,10 +132,10 @@ exports.registerStudent = async (req, res) => {
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.status(200).cookie('token', token, {
             httpOnly: true,
-            maxAge: 3600000 // 1 hora
+            maxAge: 3600000*10 // 1 hora
         });
 
-        return responseHandler(res, 201, "USER_REGISTERED", "Usuario registrado con éxito!");
+        return responseHandler(res, 201, "USER_REGISTERED", "Usuario registrado con éxito!", {email: user.email, rol: user.role});
     } catch (error) {
         console.error(error);
         return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error registrando el usuario.");
@@ -192,10 +192,10 @@ exports.login = async (req, res) => {
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.cookie('token', token, {
             httpOnly: true,
-            maxAge: 3600000 // 1 hora
+            maxAge: 3600000*10 // 1 hora
         });
 
-        return responseHandler(res, 200, "LOGIN_SUCCESS", "Sesión iniciada con éxito. ¡Bienvenido!");
+        return responseHandler(res, 200, "LOGIN_SUCCESS", "Sesión iniciada con éxito. ¡Bienvenido!", {email: user.email, rol: user.role});
     } catch (error) {
         console.error(error);
         return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error del servidor.");
