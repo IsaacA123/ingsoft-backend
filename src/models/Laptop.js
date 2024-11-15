@@ -30,22 +30,41 @@ class Laptop {
 
   static async findAll(filters = {}) {
     try {
-      let query = "SELECT * FROM laptops";
+      let query = "SELECT laptops.* FROM laptops";
       const queryParams = [];
   
+      // Si se pasa el filtro stateId
       if (filters.stateId) {
-        query += " WHERE state_id = ?";
+        query += " WHERE laptops.state_id = ?";
         queryParams.push(filters.stateId);
+      }
+  
+      // Si se pasa el filtro reservationStateId, hacer un JOIN con la tabla reservations
+      if (filters.reservationStateId) {
+        if (queryParams.length > 0) {
+          query += " AND";  // Añadir 'AND' si ya hay otros filtros
+        } else {
+          query += " WHERE";  // Usar 'WHERE' si es el primer filtro
+        }
+  
+        // Filtro para asegurar que no haya reservas con el estado dado
+        query += " NOT EXISTS (SELECT 1 FROM reservations WHERE reservations.state_id = ? AND reservations.laptop_id = laptops.id";
+        queryParams.push(filters.reservationStateId);
+  
+        // Añadir la condición de fechas futuras
+        query += " AND (reservations.reservation_date < NOW() AND reservations.start_time < NOW()))";
       }
   
       const [rows] = await db.execute(query, queryParams);
   
       return rows;
     } catch (error) {
-      console.error("Error al buscar los portatiles:", error);
+      console.error("Error al buscar los portátiles:", error);
       throw error;
     }
   }
+  
+  
   
   static async delete(id) {
     try {

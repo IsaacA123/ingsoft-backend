@@ -6,15 +6,20 @@ const LaptopDTO = require('../dtos/LaptopDto');
 
 exports.getAll = async (req, res) => {
     try {
-        const { stateId } = req.query;  
+        const { stateId, reservationStateId } = req.query;  
 
-        let result;
+        let filters = {};
 
+        // Si se pasa un stateId, lo agregamos a los filtros
         if (stateId) {
-            result = await Laptop.findAll({ stateId });
-        } else {
-            result = await Laptop.findAll();
+            filters.stateId = stateId;
         }
+        if (reservationStateId) {
+            filters.reservationStateId = reservationStateId;
+        }
+
+        // Obtenemos los portátiles filtrados
+        const result = await Laptop.findAll(filters);
 
         return responseHandler(res, 200, "LAPTOPS_FETCHED", "Portátiles obtenidos correctamente.", result);
     } catch (error) {
@@ -22,6 +27,7 @@ exports.getAll = async (req, res) => {
         return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error obteniendo los portátiles.");
     }
 };
+
 
 exports.createLaptop = async (req, res) => {
     const { description, state_id, serial } = req.body;
