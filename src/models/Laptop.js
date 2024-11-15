@@ -28,16 +28,26 @@ class Laptop {
     }
   }
 
-  static async findAll() {
+  static async findAll(filters = {}) {
     try {
-      const [rows] = await db.execute("SELECT * FROM laptops");
-      return rows.length > 0 ? rows[0] : null;
+      console.log(filters)
+      let query = "SELECT * FROM laptops";
+      const queryParams = [];
+  
+      if (filters.stateId) {
+        query += " WHERE state_id = ?";
+        queryParams.push(filters.stateId);
+      }
+  
+      const [rows] = await db.execute(query, queryParams);
+  
+      return rows;
     } catch (error) {
       console.error("Error al buscar los portatiles:", error);
       throw error;
     }
   }
-
+  
   static async delete(id) {
     try {
       const [result] = await db.execute(`DELETE FROM laptops WHERE id = ?`, [

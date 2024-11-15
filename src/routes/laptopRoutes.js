@@ -1,6 +1,6 @@
 const express = require('express');
 const laptopRoutes = express.Router();
-const { getAll, createLaptop, updateLaptop, deleteLaptop } = require('../controllers/laptopController');
+const { getAll, getAllByState, createLaptop, updateLaptop, deleteLaptop } = require('../controllers/laptopController');
 const { authMiddleware, authorizeRole } = require('../middlewares/authMiddleware');
 
 

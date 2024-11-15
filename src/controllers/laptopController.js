@@ -6,7 +6,16 @@ const LaptopDTO = require('../dtos/LaptopDto');
 
 exports.getAll = async (req, res) => {
     try {
-        const result = await Laptop.findAll();
+        const { stateId } = req.query;  
+
+        let result;
+
+        if (stateId) {
+            result = await Laptop.findAll({ stateId });
+        } else {
+            result = await Laptop.findAll();
+        }
+
         return responseHandler(res, 200, "LAPTOPS_FETCHED", "Portátiles obtenidos correctamente.", result);
     } catch (error) {
         console.error(error);
