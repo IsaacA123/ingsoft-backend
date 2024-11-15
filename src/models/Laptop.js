@@ -30,7 +30,6 @@ class Laptop {
 
   static async findAll(filters = {}) {
     try {
-      console.log(filters)
       let query = "SELECT * FROM laptops";
       const queryParams = [];
   
