@@ -330,6 +330,10 @@ paths:
               properties:
                 description:
                   example: "Lorem ipsum"
+                serial:
+                  example: "A3B22F"
+                state_id:
+                  example: "1"
         required: true
       responses:
         '200':
