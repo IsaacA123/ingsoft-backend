@@ -112,7 +112,6 @@ exports.registerStudent = async (req, res) => {
             return responseHandler(res, 400, "INVALID_INPUT", "Error de validación.", messages);
         }
 
-
         const existingUser = await User.findByEmail(email);
         if (existingUser) {
             return responseHandler(res, 409, "EMAIL_ALREADY_REGISTERED", "El correo electrónico ya está registrado, intente con otro.");
@@ -130,20 +129,19 @@ exports.registerStudent = async (req, res) => {
 
         const user = await User.findByEmail(email);
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false,
-            maxAge: 3600000*10, // 10 horas
-            domain: '.railway.app',
-            path: '/'  
-        });
 
-        return responseHandler(res, 201, "USER_REGISTERED", "Usuario registrado con éxito!", {email: user.email, rol: user.role});
+        // Aquí se envía el token directamente en la respuesta, en lugar de usar cookies
+        return responseHandler(res, 201, "USER_REGISTERED", "Usuario registrado con éxito!", { 
+            email: user.email, 
+            rol: user.role, 
+            token: token  // Enviar el token aquí
+        });
     } catch (error) {
         console.error(error);
         return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error registrando el usuario.");
     }
 };
+
 
 exports.resetPassword = async (req, res) => {
     const { email, password, code } = req.body;
@@ -193,20 +191,19 @@ exports.login = async (req, res) => {
         }
 
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false,
-            maxAge: 3600000*10, // 10 horas
-            domain: '.railway.app',
-            path: '/'  
-        });
 
-        return responseHandler(res, 200, "LOGIN_SUCCESS", "Sesión iniciada con éxito. ¡Bienvenido!", {email: user.email, rol: user.role});
+        // Aquí se envía el token directamente en la respuesta, en lugar de usar cookies
+        return responseHandler(res, 200, "LOGIN_SUCCESS", "Sesión iniciada con éxito. ¡Bienvenido!", { 
+            email: user.email, 
+            rol: user.role, 
+            token: token  // Enviar el token aquí
+        });
     } catch (error) {
         console.error(error);
         return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error del servidor.");
     }
 };
+
 
 exports.logout = (req, res) => {
     res.clearCookie('token');
