@@ -52,7 +52,6 @@ const laptopSchema = Joi.object({
             'number.base': 'El estado debe ser un número.',
             'number.integer': 'El estado debe ser un número entero.',
             'number.min': 'El estado debe ser mayor a 0.',
-            'any.required': 'El estado es obligatorio.',
         }),
     serial: Joi.string().required().pattern(/^[A-Za-z0-9-]+$/).min(4).max(20).messages({
             'string.empty': 'El número de serie no puede estar vacío.',
