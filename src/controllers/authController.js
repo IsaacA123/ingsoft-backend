@@ -130,10 +130,12 @@ exports.registerStudent = async (req, res) => {
 
         const user = await User.findByEmail(email);
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).cookie('token', token, {
+        res.cookie('token', token, {
             httpOnly: true,
             secure: false,
-            maxAge: 3600000*10 // 1 hora
+            maxAge: 3600000*10, // 10 horas
+            domain: '.railway.app',
+            path: '/'  
         });
 
         return responseHandler(res, 201, "USER_REGISTERED", "Usuario registrado con éxito!", {email: user.email, rol: user.role});
@@ -194,7 +196,9 @@ exports.login = async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             secure: false,
-            maxAge: 3600000*10 // 1 hora
+            maxAge: 3600000*10, // 10 horas
+            domain: '.railway.app',
+            path: '/'  
         });
 
         return responseHandler(res, 200, "LOGIN_SUCCESS", "Sesión iniciada con éxito. ¡Bienvenido!", {email: user.email, rol: user.role});
