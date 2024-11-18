@@ -3,7 +3,6 @@ const db = require("../config/db");
 class Laptop {
   static async create(laptopDTO) {
     const { description, state_id, serial } = laptopDTO;
-    console.log(description, state_id, serial);
     
     try {
       const [result] = await db.execute(
