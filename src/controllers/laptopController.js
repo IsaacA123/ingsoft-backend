@@ -38,7 +38,8 @@ exports.createLaptop = async (req, res) => {
             const messages = error.details.map(detail => detail.message);
             return responseHandler(res, 400, "INVALID_INPUT", "Error de validación.", messages);
         }
-        const laptopDTO = new LaptopDTO({ description, state_id, serial });
+        const laptopDTO = new LaptopDTO(description, state_id, serial);
+        console.log("a",laptopDTO);
         const result = await Laptop.create(laptopDTO);
         return responseHandler(res, 201, "LAPTOP_CREATED", "Laptop creada correctamente.", { laptopId: result.insertId });
     } catch (error) {

@@ -328,12 +328,13 @@ paths:
             schema:
               type: object
               properties:
-                description:
-                  example: "Lorem ipsum"
                 serial:
                   example: "A3B22F"
+                description:
+                  example: "Lorem ipsum"
                 state_id:
                   example: "1"
+                  type: string
         required: true
       responses:
         '200':
