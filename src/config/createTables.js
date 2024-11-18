@@ -37,7 +37,7 @@ const createTables = async () => {
     await db.execute(`
       CREATE TABLE IF NOT EXISTS laptops (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        serial_number VARCHAR(50) NOT NULL UNIQUE,
+        serial VARCHAR(50) NOT NULL UNIQUE,
         description TEXT,
         state_id INT DEFAULT 1,
         FOREIGN KEY (state_id) REFERENCES laptop_states(id)

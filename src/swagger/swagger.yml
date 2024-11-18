@@ -296,15 +296,15 @@ paths:
       
 ## laptopRoutes.js
   /laptops:
-    parameters:
-      - in: query
-        name: stateId
-        description: Filtrar los portátiles por estado. (1 para portátiles disponibles)
-        required: false
-        schema:
-          type: integer
-          example: 1
     get:
+      parameters:
+        - in: query
+          name: stateId
+          description: Filtrar los portátiles por estado. (1 para portátiles disponibles)
+          required: false
+          schema:
+            type: integer
+            example: 1
       tags:
         - admin
         - student
