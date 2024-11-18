@@ -2,19 +2,19 @@ const db = require("../config/db");
 
 class Laptop {
   static async create(laptopDTO) {
-    const { description, state_id, serial } = laptopDTO;
-    
+    const { description, state_id = 1, serial } = laptopDTO; 
+
     try {
-      const [result] = await db.execute(
-        "INSERT INTO laptops (description, state_id, serial) VALUES (?, ?, ?)",
-        [description, state_id, serial]
-      );
-      return result;
+        const [result] = await db.execute(
+            "INSERT INTO laptops (description, state_id, serial) VALUES (?, ?, ?)",
+            [description, state_id, serial] 
+        );
+        return result;
     } catch (error) {
-      console.error("Error:", error);
-      throw error;
+        console.error("Error:", error);
+        throw error;
     }
-  }
+}
 
   static async update(id, { description, state_id, serial }) {
     try {
