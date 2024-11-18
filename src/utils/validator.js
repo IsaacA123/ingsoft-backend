@@ -48,7 +48,7 @@ const laptopSchema = Joi.object({
             'string.max': 'La descripción no puede exceder los 500 caracteres.',
             'any.required': 'La descripción es obligatoria.',
         }),
-    state_id: Joi.number().integer().min(1).required().messages({
+    state_id: Joi.number().integer().min(1).messages({
             'number.base': 'El estado debe ser un número.',
             'number.integer': 'El estado debe ser un número entero.',
             'number.min': 'El estado debe ser mayor a 0.',
