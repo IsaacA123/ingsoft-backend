@@ -128,7 +128,7 @@ exports.registerStudent = async (req, res) => {
         await VerificationCode.deleteCodes(email);
 
         const user = await User.findByEmail(email);
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
 
         // Aquí se envía el token directamente en la respuesta, en lugar de usar cookies
         return responseHandler(res, 201, "USER_REGISTERED", "Usuario registrado con éxito!", { 
@@ -187,10 +187,10 @@ exports.login = async (req, res) => {
         }
 
         if (!(await bcrypt.compare(password, user.password))) {
-            return responseHandler(res, 401, "INVALID_CREDENTIALS", "Contraseña incorrecta.", "Debe ingresar una contraseña valida");
+            return responseHandler(res, 401, "INVALID_CREDENTIALS", "Contraseña incorrecta.", "La contraseña introducida es incorrecta.");
         }
 
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24    h' });
 
         // Aquí se envía el token directamente en la respuesta, en lugar de usar cookies
         return responseHandler(res, 200, "LOGIN_SUCCESS", "Sesión iniciada con éxito. ¡Bienvenido!", { 

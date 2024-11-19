@@ -8,6 +8,7 @@ const ReservationDTO = require('../dtos/ReservationDto');
 
 exports.createReservation = async (req, res) => {
     const { reservation_date, start_time, end_time, laptop_id } = req.body;
+    
     const reserved_by_user_id = req.user.id;
 
     try {
@@ -17,6 +18,7 @@ exports.createReservation = async (req, res) => {
             return responseHandler(res, 400, "INVALID_INPUT", "Error de validación.", messages);
         }
         const reservationDTO = new ReservationDTO(reservation_date, start_time, end_time, reserved_by_user_id, laptop_id);
+
         const result = await Reservation.create(reservationDTO);
         return responseHandler(res, 201, "RESERVATION_CREATED", "Reserva creada correctamente.", { reservationId: result.insertId });
     } catch (error) {
@@ -30,10 +32,18 @@ exports.getAllReservations = async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const result = (role === 'STUDENT') 
-            ? await Reservation.findByUser(userId) 
-            : await Reservation.findAll();
+        let result;
+        
+        // Si el rol es estudiante, solo obtener las reservas de ese usuario
+        if (role === 'STUDENT') {
+            result = await Reservation.findByUser(userId);
+        } else {
+            // Si es un rol diferente (por ejemplo, administrador), obtener todas las reservas
+            result = await Reservation.findAll();
+        }
+
         return responseHandler(res, 200, "RESERVATIONS_FETCHED", "Reservas obtenidas correctamente.", result);
+
     } catch (error) {
         console.error(error);
         return responseHandler(res, 500, "INTERNAL_SERVER_ERROR", "Error obteniendo las reservas.");
