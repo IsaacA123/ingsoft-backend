@@ -22,9 +22,9 @@ class Reservation {
     }
   }
   
-static async getByLaptopId(laptopId) {
+ static async getByLaptopId(laptopId) {
     try {
-      // Consulta para obtener todas las reservas para un laptop específico
+      // Consulta para obtener todas las reservas para un laptop específico, ordenadas por start_time de forma ascendente
       const [rows] = await db.execute(
         `SELECT reservations.*, 
                 users.name AS user_name, 
@@ -32,7 +32,8 @@ static async getByLaptopId(laptopId) {
          FROM reservations
          LEFT JOIN users ON reservations.reserved_by_user_id = users.id
          LEFT JOIN reservation_states ON reservations.state_id = reservation_states.id
-         WHERE reservations.laptop_id = ?`,
+         WHERE reservations.laptop_id = ?
+         ORDER BY reservations.start_time ASC`, // Orden ascendente por start_time
         [laptopId]
       );
       return rows;
@@ -41,7 +42,6 @@ static async getByLaptopId(laptopId) {
       throw error;
     }
   }
-  
   static async findById(reservationId) {
     try {
       const [result] = await db.execute(
