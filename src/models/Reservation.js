@@ -21,7 +21,27 @@ class Reservation {
       throw error;
     }
   }
-
+  
+static async getByLaptopId(laptopId) {
+    try {
+      // Consulta para obtener todas las reservas para un laptop específico
+      const [rows] = await db.execute(
+        `SELECT reservations.*, 
+                users.name AS user_name, 
+                reservation_states.name AS state_name
+         FROM reservations
+         LEFT JOIN users ON reservations.reserved_by_user_id = users.id
+         LEFT JOIN reservation_states ON reservations.state_id = reservation_states.id
+         WHERE reservations.laptop_id = ?`,
+        [laptopId]
+      );
+      return rows;
+    } catch (error) {
+      console.error("Error al obtener reservas por laptopId:", error);
+      throw error;
+    }
+  }
+  
   static async findById(reservationId) {
     try {
       const [result] = await db.execute(
