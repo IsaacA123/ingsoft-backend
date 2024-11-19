@@ -27,7 +27,7 @@ class Reservation {
       // Consulta para obtener todas las reservas para un laptop específico, ordenadas por start_time de forma ascendente
       const [rows] = await db.execute(
         `SELECT reservations.*, 
-                users.name AS user_name, 
+                users.email AS user_name, 
                 reservation_states.name AS state_name
          FROM reservations
          LEFT JOIN users ON reservations.reserved_by_user_id = users.id
@@ -65,7 +65,7 @@ class Reservation {
     let query = `
       SELECT reservations.*, 
              laptops.description AS laptop_description, 
-             users.name AS user_name
+             users.email AS user_name
       FROM reservations
       LEFT JOIN laptops ON reservations.laptop_id = laptops.id
       LEFT JOIN users ON reservations.user_id = users.id
