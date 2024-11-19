@@ -42,10 +42,7 @@ exports.getDetails = async (req, res) => {
 
 
         // Obtener las reservas asociadas al portátil, suponiendo que una Laptop tiene varias reservas
-        const reservations = await Reservation.findAll({
-            where: { laptopId },
-            order: [['startDate', 'ASC']]  // Ordenar por fecha de inicio de la reserva
-        });
+        const reservations = await Reservation.getByLaptopId(laptopId);
         
         // Mapear las reservas para solo incluir las fechas (puedes agregar más campos según lo que necesites)
         const reservationDetails = reservations.map(reservation => ({
