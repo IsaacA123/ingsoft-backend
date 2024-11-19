@@ -38,23 +38,42 @@ class Reservation {
       throw error;
     }
   }
-  static async findByUser(userId) {
-    try {
-      const query = `
-            SELECT reservations.*, laptops.description AS laptop_description, users.name AS user_name
-            FROM reservations
-            LEFT JOIN laptops ON reservations.laptop_id = laptops.id
-            LEFT JOIN users ON reservations.user_id = users.id
-            WHERE reservations.user_id = ?  -- Filtramos por el userId
-          `;
-      const [rows] = await db.execute(query, [userId]);
+  
+ static async findByUser(userId, filters = {}) {
+  try {
+    // Construir la consulta inicial
+    let query = `
+      SELECT reservations.*, 
+             laptops.description AS laptop_description, 
+             users.name AS user_name
+      FROM reservations
+      LEFT JOIN laptops ON reservations.laptop_id = laptops.id
+      LEFT JOIN users ON reservations.user_id = users.id
+      WHERE reservations.user_id = ?  -- Filtramos por el userId
+    `;
+    const queryParams = [userId];
 
-      return rows;
-    } catch (error) {
-      console.error("Error al obtener reservas por usuario:", error);
-      throw error;
+    // Filtrar por laptopId si se pasa
+    if (filters.laptopId) {
+      query += " AND reservations.laptop_id = ?";
+      queryParams.push(filters.laptopId);
     }
+
+    // Filtrar por estado de la reserva si se pasa
+    if (filters.stateId) {
+      query += queryParams.length > 1 ? " AND" : " WHERE";
+      query += " reservations.state_id = ?";
+      queryParams.push(filters.stateId);
+    }
+
+    // Ejecutar la consulta
+    const [rows] = await db.execute(query, queryParams);
+    return rows;
+  } catch (error) {
+    console.error("Error al obtener reservas por usuario:", error);
+    throw error;
   }
+}
   static async delete(reservationId) {
     try {
       const [result] = await db.execute(
